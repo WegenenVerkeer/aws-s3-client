@@ -1,0 +1,38 @@
+apply plugin: 'groovy'
+apply plugin:'application'
+version = '1.0'
+mainClassName = 'be.wegenenverkeer.s3.Etl'
+
+dependencies {
+
+    compile(
+            [group: 'org.codehaus.groovy', name: 'groovy', version: '2.0.5'],
+            [group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.7.1'],
+            [group: 'commons-cli', name: 'commons-cli', version: '1.2']
+    )
+
+//    runtime(
+//        )
+
+}
+
+sourceSets {
+  main {
+    groovy
+  }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+task uberjar(type: Jar, dependsOn:[':compileJava',':compileGroovy']) {
+
+    from files(sourceSets.main.output.classesDir)
+    from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+
+    manifest {
+        attributes "Main-Class" : mainClassName
+    }
+}

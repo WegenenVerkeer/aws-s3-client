@@ -1,0 +1,18 @@
+*.class
+*.iml
+
+.idea/
+.idea_modules/
+
+.gradle/
+
+# don't check in the credentials!
+aws-credentials.env
+
+out/
+build/
+
+# Package Files #
+*.jar
+*.war
+*.ear
