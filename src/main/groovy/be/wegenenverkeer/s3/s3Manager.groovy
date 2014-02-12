@@ -14,6 +14,7 @@ import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.*
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.PutObjectRequest
 
 import java.util.zip.ZipEntry
@@ -101,24 +102,33 @@ class s3UploadTask extends s3Task {
 
 class s3DownloadTask extends s3Task {
 
-    private final boolean deleteZipAfterUnzip = false;
+    private final boolean deleteZipAfterUnzip = true;
 
     public s3DownloadTask(dir, pattern, bucket, key) {
         super(dir, pattern, bucket, key)
     }
 
     public run() {
+        println("Starting download for bucket: $bucket, key: $key")
 
         File outFile = File.createTempFile("s3-", ".tmp.zip")
+
         super.run{ t ->
-            def objMeta = s3.getObject( new GetObjectRequest(bucket, key ), outFile)
+
+            ObjectMetadata objMeta = s3.getObject( new GetObjectRequest(bucket, key ), outFile)
+            println("Downloaded object of type: ${objMeta.contentType} and size: ${objMeta.contentLength}")
+            println("Starting unzip.")
+            unZipFile(outFile)
+            println("Finished unzip.")
+            println()
+
+            if (deleteZipAfterUnzip) {
+                println("Deleting zip file")
+                outFile.delete()
+            }
+
         }
 
-        unZipFile(outFile)
-
-        if (deleteZipAfterUnzip) {
-            outFile.delete()
-        }
     }
 
     private unZipFile(File zip) {
@@ -127,6 +137,7 @@ class s3DownloadTask extends s3Task {
         zipFile.entries().each { entry ->
            def inputStream = zipFile.getInputStream(entry)
            def outFile = new File(dir, entry.name)
+           println("Writing ${outFile.path} ....")
            def outStream = new BufferedOutputStream( new FileOutputStream(outFile))
            int n;
            byte[] buffer = new byte[1024]
