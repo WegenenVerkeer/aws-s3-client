@@ -65,7 +65,7 @@ abstract class s3Task {
 
 class s3UploadTask extends s3Task {
 
-    private final boolean deleteZipAfterUpload = false;
+    private final boolean deleteZipAfterUpload = true;
 
     public s3UploadTask(dir, pattern, bucket, key) {
         super(dir, pattern, bucket, key)
@@ -89,6 +89,7 @@ class s3UploadTask extends s3Task {
         println "Creating temporary zip file " + outFile.absolutePath
         ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(outFile))
         new File(dir).eachFileMatch(~pattern) { file ->
+            println("Adding zip file ${file.name}")
             zipFile.putNextEntry(new ZipEntry(file.getName()))
             zipFile << new FileInputStream(file)
             zipFile.closeEntry()
