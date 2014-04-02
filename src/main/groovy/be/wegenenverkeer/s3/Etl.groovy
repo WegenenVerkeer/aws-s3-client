@@ -14,6 +14,8 @@ class Etl {
         cli.d(longOpt: 'dir', args:1 , argName: 'dir', 'input or output directory')
         cli.p(longOpt: 'pattern', args:1 , argName: 'pattern', 'file input pattern')
         cli.h(longOpt: 'help', 'print usage')
+        cli.PH(longOpt: 'proxyhost', args:1 , argName: 'proxyhost', 'proxy host')
+        cli.PP(longOpt: 'proxyport', args:1 , argName: 'proxyport', 'proxy port')
 
         def options = cli.parse(args)
 
@@ -31,12 +33,12 @@ class Etl {
     }
 
     static def doUpload(options) {
-        def task = new s3UploadTask(options.d, options.p, options.b, options.k)
+        def task = new s3UploadTask(options.d, options.p, options.b, options.k, options.PH, options.PP)
         task.run()
     }
 
     static def doDownload(options) {
-        def task = new s3DownloadTask(options.d, options.p, options.b, options.k)
+        def task = new s3DownloadTask(options.d, options.p, options.b, options.k, options.PH, options.PP)
         task.run()
     }
 }

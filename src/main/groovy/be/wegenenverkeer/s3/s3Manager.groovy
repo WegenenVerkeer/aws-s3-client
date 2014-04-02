@@ -8,6 +8,7 @@ package be.wegenenverkeer.s3
 
 import com.amazonaws.AmazonClientException
 import com.amazonaws.AmazonServiceException
+import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.regions.Region
@@ -27,15 +28,25 @@ abstract class s3Task {
     final String bucket
     final String key
 
-    s3Task(dir, pattern, bucket, key) {
+    s3Task(dir, pattern, bucket, key, proxyhost, proxyport) {
 
         this.dir = dir
         this.pattern = pattern
         this.bucket = bucket
         this.key = key
 
+        ClientConfiguration clientConfiguration = new ClientConfiguration()
+
+        if(proxyhost != null) {
+            clientConfiguration.setProxyHost(proxyhost)
+        }
+
+        if(proxyport != null) {
+            clientConfiguration.setProxyPort(Integer.parseInt(proxyport))
+        }
+
         //create the s3 client
-        s3 = new AmazonS3Client(new EnvironmentVariableCredentialsProvider())
+        s3 = new AmazonS3Client(new EnvironmentVariableCredentialsProvider(), clientConfiguration)
         Region region = Region.getRegion(Regions.EU_WEST_1)
         s3.setRegion(region)
     }
@@ -67,20 +78,21 @@ class s3UploadTask extends s3Task {
 
     private final boolean deleteZipAfterUpload = true;
 
-    public s3UploadTask(dir, pattern, bucket, key) {
-        super(dir, pattern, bucket, key)
+    public s3UploadTask(dir, pattern, bucket, key, proxyhost = null, proxyport = null) {
+        super(dir, pattern, bucket, key, proxyhost, proxyport)
     }
 
     public run() {
 
         def zipFile = createZipFile()
-
+        println("Starting upload.....")
         super.run{ t ->
             s3.putObject(new PutObjectRequest(bucket, key, zipFile));
         }
-
+        println("Finished upload.")
         if (deleteZipAfterUpload) {
             zipFile.delete()
+            println("Zip file deleted.")
         }
     }
 
@@ -105,8 +117,8 @@ class s3DownloadTask extends s3Task {
 
     private final boolean deleteZipAfterUnzip = true;
 
-    public s3DownloadTask(dir, pattern, bucket, key) {
-        super(dir, pattern, bucket, key)
+    public s3DownloadTask(dir, pattern, bucket, key, proxyhost = null, proxyport = null) {
+        super(dir, pattern, bucket, key,proxyhost, proxyport)
     }
 
     public run() {
