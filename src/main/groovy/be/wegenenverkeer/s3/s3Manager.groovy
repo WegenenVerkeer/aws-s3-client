@@ -37,11 +37,11 @@ abstract class s3Task {
 
         ClientConfiguration clientConfiguration = new ClientConfiguration()
 
-        if(proxyhost != null) {
+        if(proxyhost) {
             clientConfiguration.setProxyHost(proxyhost)
         }
 
-        if(proxyport != null) {
+        if(proxyport) {
             clientConfiguration.setProxyPort(Integer.parseInt(proxyport))
         }
 
@@ -78,7 +78,7 @@ class s3UploadTask extends s3Task {
 
     private final boolean deleteZipAfterUpload = true;
 
-    public s3UploadTask(dir, pattern, bucket, key, proxyhost = null, proxyport = null) {
+    public s3UploadTask(dir, pattern, bucket, key, proxyhost, proxyport) {
         super(dir, pattern, bucket, key, proxyhost, proxyport)
     }
 
@@ -117,7 +117,7 @@ class s3DownloadTask extends s3Task {
 
     private final boolean deleteZipAfterUnzip = true;
 
-    public s3DownloadTask(dir, pattern, bucket, key, proxyhost = null, proxyport = null) {
+    public s3DownloadTask(dir, pattern, bucket, key, proxyhost, proxyport) {
         super(dir, pattern, bucket, key,proxyhost, proxyport)
     }
 
