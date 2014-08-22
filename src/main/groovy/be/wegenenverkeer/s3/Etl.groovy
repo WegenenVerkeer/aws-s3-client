@@ -19,6 +19,10 @@ class Etl {
 
         def options = cli.parse(args)
 
+        if (options == null){
+            //cli parse error
+            return
+        }
         if (options.h) {
             println(cli.usage())
             return
