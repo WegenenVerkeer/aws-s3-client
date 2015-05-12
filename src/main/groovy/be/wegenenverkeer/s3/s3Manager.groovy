@@ -28,27 +28,13 @@ abstract class s3Task {
     final String bucket
     final String key
 
-    s3Task(dir, pattern, bucket, key, proxyhost, proxyport) {
+    s3Task(client, dir, pattern, bucket, key) {
 
         this.dir = dir
         this.pattern = pattern
         this.bucket = bucket
         this.key = key
-
-        ClientConfiguration clientConfiguration = new ClientConfiguration()
-
-        if(proxyhost) {
-            clientConfiguration.setProxyHost(proxyhost)
-        }
-
-        if(proxyport) {
-            clientConfiguration.setProxyPort(Integer.parseInt(proxyport))
-        }
-
-        //create the s3 client
-        s3 = new AmazonS3Client(new EnvironmentVariableCredentialsProvider(), clientConfiguration)
-        Region region = Region.getRegion(Regions.EU_WEST_1)
-        s3.setRegion(region)
+        this.s3 = client
     }
 
     def run(Closure closure) {
@@ -78,8 +64,8 @@ class s3UploadTask extends s3Task {
 
     private final boolean deleteZipAfterUpload = true;
 
-    public s3UploadTask(dir, pattern, bucket, key, proxyhost, proxyport) {
-        super(dir, pattern, bucket, key, proxyhost, proxyport)
+    public s3UploadTask(client, dir, pattern, bucket, key) {
+        super(client, dir, pattern, bucket, key)
     }
 
     public run() {
@@ -117,8 +103,8 @@ class s3DownloadTask extends s3Task {
 
     private final boolean deleteZipAfterUnzip = true;
 
-    public s3DownloadTask(dir, pattern, bucket, key, proxyhost, proxyport) {
-        super(dir, pattern, bucket, key,proxyhost, proxyport)
+    public s3DownloadTask(client, dir, pattern, bucket, key) {
+        super(client, dir, pattern, bucket, key)
     }
 
     public run() {
