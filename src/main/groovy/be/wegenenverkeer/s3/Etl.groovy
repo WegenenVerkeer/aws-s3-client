@@ -74,7 +74,7 @@ class Etl {
         def s3 = null
         if(options.SK || options.PK ){
             println"Using Client-side encryption with ${options.SK} / ${options.PK}"
-            def keyPair = KeyLoader.loadKeyPair(options.SK ? options.SK : null, options.PK)
+            def keyPair = KeyLoader.loadKeyPair( options.SK ? options.SK : null , options.PK ? options.PK : null)
             def materials = new EncryptionMaterials(keyPair)
             s3 = new AmazonS3EncryptionClient(new EnvironmentVariableCredentialsProvider(),
                     new StaticEncryptionMaterialsProvider(materials), clientConfiguration, new CryptoConfiguration())
